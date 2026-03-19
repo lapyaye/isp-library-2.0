@@ -16,7 +16,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Left Side: Logo & Mobile Nav */}
-        <div className="flex items-center gap-2 lg:flex-1">
+        <div className="flex items-center gap-2">
           <MobileNav />
           <Link href="/" className="flex items-center gap-2">
             <Library className="h-6 w-6 text-pink-600 dark:text-pink-500" />
@@ -25,7 +25,7 @@ export function Header() {
         </div>
 
         {/* Center: Desktop Nav */}
-        <div className="hidden md:flex flex-1 justify-center md:ml-3 lg:ml-0">
+        <div className="hidden md:flex flex-1 justify-center">
           <nav className="flex items-center gap-6">
             <Link
               href="/books"
@@ -70,7 +70,7 @@ export function Header() {
         </div>
 
         {/* Right Side: Auth */}
-        <div className="flex items-center justify-end gap-3 flex-1">
+        <div className="flex items-center justify-end gap-3">
           <ThemeToggle />
           {user.user_id ? (
             <UserNav />
