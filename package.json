@@ -6,7 +6,7 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "scripts": {
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "dev": "next dev",
     "db:seed": "npx prisma db seed",
     "db:admin-seed": "npx tsx prisma/admin-seed.ts",
