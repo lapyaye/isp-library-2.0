@@ -18,8 +18,9 @@ export function SignOutButton() {
           icon: 'text-red-500',
         }
       })
-      router.push("/auth/login")
-      router.refresh()
+      window.location.href = "/auth/login";
+      // router.push("/auth/login")
+      // router.refresh()
     } catch (error) {
       toast.error("Failed to sign out. Please try again.", {
         classNames: {
