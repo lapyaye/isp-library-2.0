@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
+import { InitialPreloader } from "@/components/initial-preloader"
 
 import { getSession } from "@/lib/db/auth"
 import ReduxProvider from "@/lib/redux/provider"
@@ -61,9 +62,9 @@ export default async function RootLayout({
             storageKey="theme"
             disableTransitionOnChange={false}
           >
+            <InitialPreloader />
             <Header />
             <main>{children}</main>
-            {/* <Analytics /> */}
             <Toaster position="top-right" />
           </ThemeProvider>
         </ReduxProvider>

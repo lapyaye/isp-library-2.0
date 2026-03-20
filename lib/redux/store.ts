@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit"
 import { libraryApi } from "./services/libraryApi"
 import authReducer from "./slices/authSlice"
+import uiReducer from "./slices/uiSlice"
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             auth: authReducer,
+            ui: uiReducer,
             [libraryApi.reducerPath]: libraryApi.reducer,
         },
         middleware: (getDefaultMiddleware) =>
