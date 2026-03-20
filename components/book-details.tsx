@@ -62,18 +62,18 @@ export function BookDetails({
     }
 
     try {
-      const result = await borrowBook({
-        bookId: book.book_id,
-        userId: user.user_id,
-        authorId: book.author_id ?? "",
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-      }).unwrap()
-
       toast.success("Book borrowed successfully", {
         classNames: {
           icon: 'text-green-500',
         }
       })
+
+      await borrowBook({
+        bookId: book.book_id,
+        userId: user.user_id,
+        authorId: book.author_id ?? "",
+        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+      }).unwrap()
     } catch (err) {
       toast.error("Failed to borrow book. Please try again.", {
         classNames: {

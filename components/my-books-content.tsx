@@ -40,7 +40,7 @@ export function MyBooksContent({ borrowed, overDue, returned }: MyBooksContentPr
       }
     })
 
-    returnBook({ borrowId: borrowedBook.id, userId: borrowedBook.user_id }).unwrap().then((data) => {
+    returnBook({ borrowId: borrowedBook.id, userId: borrowedBook.user_id, bookId: borrowedBook.book_id || "" }).unwrap().then((data) => {
       // do nothing if it returns successfully
       router.refresh()
     }, (error) => {

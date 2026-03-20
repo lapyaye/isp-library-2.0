@@ -103,7 +103,7 @@ export function LibraryCard({ user, borrowedCount, memberSince }: LibraryCardPro
           </CardContent>
         </Card>
       </div>
-      <Button onClick={handleDownload} variant="ghost" className="flex items-center justify-center gap-2 group mx-auto hover:bg-secondary/40">
+      <Button onClick={handleDownload} variant="outline" className="flex items-center justify-center gap-2 group mx-auto hover:bg-primary/40 dark:hover:bg-primary/20">
         <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
         Download Library Card
       </Button>

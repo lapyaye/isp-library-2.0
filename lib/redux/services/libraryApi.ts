@@ -151,27 +151,79 @@ export const libraryApi = createApi({
                 { type: "Book", id: "LIST" }, // Invalidate all books
                 { type: "BorrowedBook", id: "LIST" }, // Invalidate user's borrowed list
             ],
+            async onQueryStarted({ bookId, userId, authorId, dueDate }, { dispatch, queryFulfilled }) {
+                // Optimistic update for getBorrowedBooksByUserId
+                // We use temp-id to save in the cache store
+                const patchResult1 = dispatch(
+                    libraryApi.util.updateQueryData("getBorrowedBooksByUserId", userId, (draft) => {
+                        draft.push({
+                            id: "temp-id-" + Date.now(),
+                            borrow_id: "temp-borrow-id-" + Date.now(),
+                            book_id: bookId,
+                            user_id: userId,
+                            author_id: authorId,
+                            status: "borrowed" as const,
+                            borrowed_at: new Date().toISOString(),
+                            due_date: dueDate,
+                            returned_at: "",
+                            title: null,
+                            author_name: null,
+                            username: null,
+                            email: null,
+                        })
+                    })
+                )
+
+                // Optimistic update for checkBookBorrowed
+                const patchResult2 = dispatch(
+                    libraryApi.util.updateQueryData("checkBookBorrowed", bookId, (draft) => {
+                        return {
+                            id: "temp-id-" + Date.now(),
+                            borrow_id: "temp-borrow-id-" + Date.now(),
+                            book_id: bookId,
+                            user_id: userId,
+                            author_id: authorId,
+                            status: "borrowed" as const,
+                            borrowed_at: new Date().toISOString(),
+                            due_date: dueDate,
+                            returned_at: "",
+                            title: null,
+                            author_name: null,
+                            username: null,
+                            email: null,
+                        }
+                    })
+                )
+
+                try {
+                    await queryFulfilled
+                } catch {
+                    patchResult1.undo()
+                    patchResult2.undo()
+                }
+            }
         }),
-        returnBook: builder.mutation<ApiReturnResponse<BorrowedBook>, { borrowId: string, userId: string | null }>({
-            query: (body) => ({
+        // Return book
+        returnBook: builder.mutation<ApiReturnResponse<BorrowedBook>, { borrowId: string, userId: string | null, bookId: string }>({
+            query: ({ borrowId, userId }) => ({
                 url: "api/return",
                 method: "PATCH",
-                body,
+                body: { borrowId, userId },
             }),
-            // invalidatesTags: (result, error, { borrowId }) => [
-            //     { type: "BorrowedBook", id: borrowId },
-            //     { type: "BorrowedBook", id: "LIST" },
-            // ],
-
+            // Invalidate tags to ensure consistency after optimistic update
+            invalidatesTags: (result, error, { bookId }) => [
+                { type: "Book", id: bookId },
+                { type: "BorrowedBook", id: "LIST" },
+            ],
             // Optimistic update
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-                const patchResult = dispatch(
+            async onQueryStarted({ borrowId, userId, bookId }, { dispatch, queryFulfilled }) {
+                const patchResult1 = dispatch(
                     libraryApi.util.updateQueryData(
                         "getBorrowedBooksByUserId",
-                        arg.userId || "",
+                        userId || "",
                         (draft) => {
                             const index = draft.findIndex(
-                                (borrowedBook) => borrowedBook.id === arg.borrowId
+                                (borrowedBook) => borrowedBook.id === borrowId
                             )
                             if (index !== -1) {
                                 draft[index].returned_at = new Date().toISOString()
@@ -180,10 +232,18 @@ export const libraryApi = createApi({
                         }
                     )
                 )
+
+                const patchResult2 = dispatch(
+                    libraryApi.util.updateQueryData("checkBookBorrowed", bookId, (draft) => {
+                        return null
+                    })
+                )
+
                 try {
                     await queryFulfilled
                 } catch (err) {
-                    patchResult.undo()
+                    patchResult1.undo()
+                    patchResult2.undo()
                 }
             },
         }),
