@@ -50,17 +50,17 @@ export function HomeCTASection() {
     return (
         <section className="py-20">
             <div className="container mx-auto px-4">
-                <Card className="bg-primary text-primary-foreground border-0">
+                <Card className="bg-primary text-secondary-foreground border-0">
                     <CardContent className="p-12 text-center">
                         <h2 className="text-3xl font-bold mb-4 text-balance">
                             {!isAuthenticated ? "Ready to Start Reading?" :
                                 session.isAdmin ? "Ready to Manage and Track Borrowed Books?" : "Ready to Start Reading?"}
                         </h2>
-                        <p className="mb-8 text-primary-foreground/80 max-w-xl mx-auto">
+                        <p className="mb-8 text-secondary-foreground max-w-xl mx-auto">
                             {!isAuthenticated ? "Join our library today and get access to thousands of books. Track your reading, discover new authors, and more." :
                                 session.isAdmin ? "Manage your library and borrowed books from users" : "Manage your borrowed books and keep track of your reading progress."}
                         </p>
-                        <Button size="lg" variant="outline" className="text-primary dark:text-primary-foreground" asChild>
+                        <Button size="lg" variant="outline" className="text-primary dark:text-secondary-foreground" asChild>
                             {!isAuthenticated ? <Link href="/auth/sign-up">Get Your Library Card</Link> :
                                 session.isAdmin ? <Link href="/admin">Go to Admin Dashboard</Link> : <Link href="/my-books">My Books</Link>}
                         </Button>

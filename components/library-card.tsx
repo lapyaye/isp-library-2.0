@@ -64,7 +64,7 @@ export function LibraryCard({ user, borrowedCount, memberSince }: LibraryCardPro
   return (
     <div className="space-y-4">
       <div ref={cardRef}>
-        <Card className="bg-linear-to-br from-library-card to-library-card/90 text-primary-foreground border-0 shadow-xl overflow-hidden">
+        <Card className="bg-linear-to-br from-library-card to-library-card/80 text-primary-foreground border-0 shadow-xl overflow-hidden">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <Library className="h-8 w-8" />
@@ -103,7 +103,7 @@ export function LibraryCard({ user, borrowedCount, memberSince }: LibraryCardPro
           </CardContent>
         </Card>
       </div>
-      <Button onClick={handleDownload} variant="outline" className="flex items-center justify-center gap-2 group mx-auto hover:bg-primary/40 dark:hover:bg-primary/20">
+      <Button onClick={handleDownload} variant="default" className="flex items-center justify-center gap-2 group mx-auto">
         <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
         Download Library Card
       </Button>

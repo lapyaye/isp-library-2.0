@@ -8,7 +8,6 @@ import {
   AllCommunityModule,
   ModuleRegistry,
   type ColDef,
-  type GridReadyEvent,
   type ValueFormatterParams,
 } from "ag-grid-community"
 
@@ -18,7 +17,6 @@ import Link from "next/link"
 import { useGetBooksQuery } from "@/lib/redux/services/libraryApi"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { selectUser } from "@/lib/redux/slices/authSlice"
-import { Skeleton } from "./ui/skeleton"
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule])
