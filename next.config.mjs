@@ -7,6 +7,7 @@ const nextConfig = {
     unoptimized: true,
   },
   reactStrictMode: false,
+  allowedDevOrigins: ["https://unnational-impermeably-ilse.ngrok-free.dev"],
 }
 
 export default nextConfig
