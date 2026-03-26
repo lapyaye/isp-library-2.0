@@ -2,12 +2,10 @@ import mailchimpTransactional from "@mailchimp/mailchimp_transactional"
 
 const mailchimp = mailchimpTransactional(process.env.MAILCHIMP_API_KEY || "")
 const FROM_EMAIL = process.env.NODE_ENV === 'production'
-    ? process.env.MAILCHIMP_FROM_EMAIL || "noreply@ispmyanmar.com"
-    : "test@example.mandrillapp.com"
+    ? process.env.MAILCHIMP_FROM_EMAIL : "library@ispmyanmar.com"
 
 const FROM_NAME = process.env.NODE_ENV === 'production'
-    ? process.env.MAILCHIMP_FROM_NAME || "ISP Library"
-    : "ISP Library"
+    ? process.env.MAILCHIMP_FROM_NAME : "ISP Library"
 
 export async function sendPasswordResetEmail(
     to: string,
