@@ -21,7 +21,7 @@ export async function sendPasswordResetEmail(
                 html: `
                 ${process.env.NODE_ENV !== 'production' ? `
                 <div style="background: #fef3c7; padding: 12px; margin-bottom: 16px; border-radius: 8px;">
-                    <strong>🧪 TEST MODE</strong><br>
+                    <strong>TEST MODE</strong><br>
                     This email was intended for: ${to}
                 </div>
                 ` : ''}
