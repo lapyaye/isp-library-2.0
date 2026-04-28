@@ -1,6 +1,5 @@
 import ResetPasswordForm from "@/components/reset-password";
 import { Library } from "lucide-react";
-import { Suspense } from "react";
 
 export default function Page() {
     return (
@@ -12,9 +11,7 @@ export default function Page() {
                             <Library className="h-8 w-8 text-primary" />
                         </div>
                     </div>
-                    <Suspense>
-                        <ResetPasswordForm />
-                    </Suspense>
+                    <ResetPasswordForm />
                 </div>
             </div>
         </div>

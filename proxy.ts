@@ -62,7 +62,7 @@ export async function proxy(request: NextRequest) {
     }
 
     // Redirect to login page if sign-up-success page is accessed and user is not authenticated
-    if (request.nextUrl.pathname === "/auth/sign-up-success" && !effectiveUser) {
+    if (request.nextUrl.pathname === "/auth/sign-up-success" && !request.nextUrl.searchParams.get("mailConfirming")) {
         const url = request.nextUrl.clone()
         url.pathname = "/auth/login"
         return NextResponse.redirect(url)
@@ -89,7 +89,7 @@ export async function proxy(request: NextRequest) {
 
     // Protect API routes
     if (request.nextUrl.pathname.startsWith("/api")) {
-        const publicApiPaths = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/refresh", "/api/auth/forgot-password", "/api/auth/reset-password"]
+        const publicApiPaths = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/refresh", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/account-confirm"]
         const adminApiPaths = ["/api/users"]
         const isPublicApi = publicApiPaths.some((path) => request.nextUrl.pathname.startsWith(path))
         const isAdminApi = adminApiPaths.some((path) => request.nextUrl.pathname.startsWith(path))

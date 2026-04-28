@@ -49,7 +49,7 @@ export function AuthorsList() {
     return (
         <div className="space-y-10">
             <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
-                <div className="space-y-1">
+                <div className="space-y-1 w-full lg:w-auto text-center lg:text-left">
                     <h1 className="text-3xl font-black tracking-tight text-foreground">Authors</h1>
                     <p className="text-muted-foreground text-base">Browse our collection of {authors?.length || 0} distinguished writers.</p>
                 </div>

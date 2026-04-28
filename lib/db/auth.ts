@@ -6,13 +6,15 @@ import { getUserByEmail, getUserById } from "./client"
 import * as bcrypt from "bcryptjs"
 import {
     generateAccessToken,
+    generateAccountConfirmToken,
     generateRefreshToken,
     generateResetToken,
     verifyAccessToken,
+    verifyAccountConfirmToken,
     verifyRefreshToken,
     verifyResetToken
 } from "./auth-tokens"
-import { sendPasswordResetEmail } from "../email"
+import { sendConfirmationMail, sendPasswordResetEmail } from "../email"
 import { prisma } from "../prisma"
 
 export const REFRESH_TOKEN_COOKIE = "refresh_token"
@@ -49,6 +51,7 @@ export async function login(
             email: user.email,
             username: user.username,
             isAdmin: user.is_admin || false,
+            isVerified: user.is_verified,
             created_at: user.created_at.toISOString(),
             updated_at: user.updated_at.toISOString(),
         }
@@ -209,30 +212,22 @@ export async function signup(
             }
         })
 
-        const sessionUser: SessionUser = {
-            id: user.id,
-            user_id: user.user_id,
-            email: user.email,
-            username: user.username,
-            isAdmin: user.is_admin || false,
-            created_at: user.created_at.toISOString(),
-            updated_at: user.updated_at.toISOString(),
+        // Mail Confirmation
+        const confirmationToken = await generateAccountConfirmToken(user.email, user.id)
+        const BASE_URL = process.env.NODE_ENV === "production"
+            ? process.env.NEXT_PUBLIC_APP_URL
+            : "https://unnational-impermeably-ilse.ngrok-free.dev" // ← real URL for email testing
+        const confirmationUrl = `${BASE_URL}/auth/verify-account?token=${confirmationToken}`
+
+        console.log("confirmationUrl", confirmationUrl);
+
+        const mailConfirm = await sendConfirmationMail(email, confirmationUrl)
+        if (!mailConfirm.success) {
+            console.error("Failed to send confirmation email:", mailConfirm.error)
+            return { success: false, error: "Failed to send confirmation email. Please try again." }
         }
 
-        // Generate tokens
-        const accessToken = await generateAccessToken(sessionUser)
-        const refreshToken = await generateRefreshToken(sessionUser)
-
-        // Store refresh token in DB
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { refresh_token: refreshToken }
-        })
-
-        // Set cookies
-        await setSession(refreshToken)
-
-        return { success: true, user: sessionUser, accessToken }
+        return { success: true }
     } catch (error) {
         console.error("Signup error:", error)
         return { success: false, error: "An error occurred during signup" }
@@ -308,6 +303,62 @@ export async function resetPassword(
         return { success: true }
     } catch (error) {
         console.error("Reset password error:", error)
+        return { success: false, error: "An error occurred. Please try again." }
+    }
+}
+
+export async function accountConfirm(
+    token: string
+): Promise<Partial<ApiResponse<SessionUser>>> {
+    try {
+        const payload = await verifyAccountConfirmToken(token)
+
+        if (!payload) {
+            return { success: false, error: "Invalid or expired account confirmation token." }
+        }
+
+        const user = await prisma.user.findFirst({
+            where: { id: payload.userId, email: payload.email, is_verified: false }
+        })
+
+        if (!user) {
+            return { success: false, error: "User not found or already verified" }
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                is_verified: true,
+            }
+        })
+
+        const sessionUser: SessionUser = {
+            id: updatedUser.id,
+            user_id: updatedUser.user_id,
+            email: updatedUser.email,
+            username: updatedUser.username,
+            isAdmin: updatedUser.is_admin,
+            isVerified: updatedUser.is_verified,
+            created_at: updatedUser.created_at.toISOString(),
+            updated_at: updatedUser.updated_at.toISOString(),
+        }
+
+        // Generate tokens
+        const accessToken = await generateAccessToken(sessionUser)
+        const refreshToken = await generateRefreshToken(sessionUser)
+
+        // Store refresh token in DB
+        await prisma.user.update({
+            where: { id: updatedUser.id },
+            data: { refresh_token: refreshToken }
+        })
+
+        // Set cookies
+        await setSession(refreshToken)
+
+        return { success: true, user: sessionUser, accessToken }
+    } catch (error) {
+        console.error("Account confirm error:", error)
         return { success: false, error: "An error occurred. Please try again." }
     }
 }

@@ -18,6 +18,7 @@ model User {
   refresh_token String?  @unique
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+  is_verified   Boolean @default(false)
 
   borrow_books BorrowedBook[]
 

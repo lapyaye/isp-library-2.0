@@ -39,6 +39,14 @@ export async function generateResetToken(userId: string): Promise<string> {
         .sign(JWT_RESET_SECRET)
 }
 
+export async function generateAccountConfirmToken(email: string, userId: string): Promise<string> {
+    return await new SignJWT({ email, userId })
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setExpirationTime(RESET_TOKEN_EXPIRY)
+        .sign(JWT_RESET_SECRET)
+}
+
 export async function verifyAccessToken(token: string): Promise<SessionUser | null> {
     try {
         const { payload } = await jwtVerify(token, JWT_ACCESS_SECRET)
@@ -54,7 +62,7 @@ export async function verifyRefreshToken(token: string): Promise<{ userId: strin
         const { payload } = await jwtVerify(token, JWT_REFRESH_SECRET)
         return payload as unknown as { userId: string, isAdmin?: boolean }
     } catch (error: any) {
-        // console.error('Refresh Token Verification failed:', error.code);
+        console.error('Refresh Token Verification failed:', error.code);
         return null
     }
 }
@@ -65,6 +73,17 @@ export async function verifyResetToken(token: string): Promise<{ userId: string 
         return payload as unknown as { userId: string }
     } catch (error: any) {
         console.error('Reset Token Verification failed:', error.code);
+        return null
+    }
+}
+
+export async function verifyAccountConfirmToken(token: string): Promise<{ email: string, userId: string } | null> {
+    try {
+        const { payload } = await jwtVerify(token, JWT_RESET_SECRET)
+        console.log("payload", payload);
+        return payload as unknown as { email: string, userId: string }
+    } catch (error: any) {
+        console.error('Account Confirm Token Verification failed:', error.code);
         return null
     }
 }

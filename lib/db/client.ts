@@ -247,6 +247,7 @@ export async function getUserById(id: string): Promise<SessionUser | null> {
                 email: true,
                 username: true,
                 is_admin: true,
+                is_verified: true,
                 created_at: true,
                 updated_at: true
             }
@@ -258,6 +259,7 @@ export async function getUserById(id: string): Promise<SessionUser | null> {
             username: user.username,
             email: user.email,
             isAdmin: user.is_admin,
+            isVerified: user.is_verified,
             created_at: user.created_at.toISOString(),
             updated_at: user.updated_at.toISOString(),
         }

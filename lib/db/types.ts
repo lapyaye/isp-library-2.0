@@ -25,6 +25,7 @@ export interface SessionUser {
     email: string
     username: string
     isAdmin: boolean
+    isVerified?: boolean
     created_at: string
     updated_at?: string
 }

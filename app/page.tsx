@@ -1,11 +1,8 @@
-import { Suspense } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { BookOpen, Search, CreditCard, BarChart3 } from "lucide-react"
 import {
   HomeHeroButtons,
-  HomeHeroButtonsSkeleton,
   HomeCTASection,
-  HomeCTASectionSkeleton
 } from "@/components/home-auth-content"
 
 export default function HomePage() {

@@ -14,6 +14,7 @@ const initialState: AuthState = {
         email: "",
         username: "",
         isAdmin: false,
+        isVerified: false,
         created_at: "",
     },
     accessToken: null,

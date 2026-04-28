@@ -12,13 +12,18 @@ export async function POST(request: Request) {
             )
         }
 
+        if (!email.endsWith("@ispmyanmar.com")) {
+            return NextResponse.json(
+                { success: false, error: "Only ispmyanmar email addresses are allowed" },
+                { status: 400 }
+            )
+        }
+
         const result = await signup(username, email, hashedPassword)
 
-        if (result.success && result.user) {
-            return NextResponse.json({ 
-                success: true, 
-                user: result.user,
-                accessToken: result.accessToken 
+        if (result.success) {
+            return NextResponse.json({
+                success: true,
             })
         } else {
             return NextResponse.json(

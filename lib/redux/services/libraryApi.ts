@@ -315,7 +315,7 @@ export const libraryApi = createApi({
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled
-                    dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }))
+                    // dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }))
                 } catch (err) {
                     // Sign up failed
                 }

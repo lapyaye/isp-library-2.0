@@ -1,25 +1,25 @@
+import { accountConfirm } from "@/lib/db/auth"
 import { NextResponse } from "next/server"
-import { login } from "@/lib/db/auth"
 
 export async function POST(request: Request) {
     try {
-        const { email, password } = await request.json()
+        const { token } = await request.json()
 
-        if (!email || !password) {
+        if (!token) {
             return NextResponse.json(
-                { success: false, error: "Email and password are required" },
+                { success: false, message: "Token is required" },
                 { status: 400 }
             )
         }
 
-        if (!email.endsWith("@ispmyanmar.com")) {
+        const result = await accountConfirm(token)
+
+        if (!result.success) {
             return NextResponse.json(
-                { success: false, error: "Only ispmyanmar email addresses are allowed" },
+                { success: false, message: result.error },
                 { status: 400 }
             )
         }
-
-        const result = await login(email, password)
 
         if (result.success && result.user) {
             return NextResponse.json({
@@ -34,9 +34,8 @@ export async function POST(request: Request) {
             { status: 401 }
         )
     } catch (error) {
-        console.error("Login API error:", error)
         return NextResponse.json(
-            { success: false, error: "Internal server error" },
+            { success: false, message: "Internal server error" },
             { status: 500 }
         )
     }
