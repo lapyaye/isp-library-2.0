@@ -196,7 +196,7 @@ export async function sendWelcomeEmail(to: string, username: string) {
 
                         <div style="margin: 0;">
                             <p style="margin: 0 0 4px 0; font-weight: 700; font-size: 14px; color: #18181b;">4. Return Policy</p>
-                            <p style="margin: 0; font-size: 14px; color: #52525b; line-height: 1.5;">Books must be returned by the due date to the designated return location only.</p>
+                            <p style="margin: 0; font-size: 14px; color: #52525b; line-height: 1.5;">Books must be returned by the due date to the designated bookshelf only.</p>
                         </div>
                     </div>
 
