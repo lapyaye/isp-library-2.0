@@ -39,8 +39,8 @@ export async function generateResetToken(userId: string): Promise<string> {
         .sign(JWT_RESET_SECRET)
 }
 
-export async function generateAccountConfirmToken(email: string, userId: string): Promise<string> {
-    return await new SignJWT({ email, userId })
+export async function generateAccountConfirmToken(userId: string): Promise<string> {
+    return await new SignJWT({ userId })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(RESET_TOKEN_EXPIRY)
@@ -77,11 +77,10 @@ export async function verifyResetToken(token: string): Promise<{ userId: string 
     }
 }
 
-export async function verifyAccountConfirmToken(token: string): Promise<{ email: string, userId: string } | null> {
+export async function verifyAccountConfirmToken(token: string): Promise<{ userId: string } | null> {
     try {
         const { payload } = await jwtVerify(token, JWT_RESET_SECRET)
-        console.log("payload", payload);
-        return payload as unknown as { email: string, userId: string }
+        return payload as unknown as { userId: string }
     } catch (error: any) {
         console.error('Account Confirm Token Verification failed:', error.code);
         return null

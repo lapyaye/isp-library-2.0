@@ -14,7 +14,7 @@ import {
     verifyRefreshToken,
     verifyResetToken
 } from "./auth-tokens"
-import { sendConfirmationMail, sendPasswordResetEmail } from "../email"
+import { sendConfirmationMail, sendPasswordResetEmail, sendWelcomeEmail } from "../email"
 import { prisma } from "../prisma"
 
 export const REFRESH_TOKEN_COOKIE = "refresh_token"
@@ -213,15 +213,16 @@ export async function signup(
         })
 
         // Mail Confirmation
-        const confirmationToken = await generateAccountConfirmToken(user.email, user.id)
+        const confirmationToken = await generateAccountConfirmToken(user.id)
         const BASE_URL = process.env.NODE_ENV === "production"
             ? process.env.NEXT_PUBLIC_APP_URL
             : "https://unnational-impermeably-ilse.ngrok-free.dev" // ← real URL for email testing
         const confirmationUrl = `${BASE_URL}/auth/verify-account?token=${confirmationToken}`
 
-        console.log("confirmationUrl", confirmationUrl);
+        // console.log("confirmationUrl", confirmationUrl);
 
         const mailConfirm = await sendConfirmationMail(email, confirmationUrl)
+
         if (!mailConfirm.success) {
             console.error("Failed to send confirmation email:", mailConfirm.error)
             return { success: false, error: "Failed to send confirmation email. Please try again." }
@@ -318,7 +319,7 @@ export async function accountConfirm(
         }
 
         const user = await prisma.user.findFirst({
-            where: { id: payload.userId, email: payload.email, is_verified: false }
+            where: { id: payload.userId, is_verified: false }
         })
 
         if (!user) {
@@ -355,6 +356,14 @@ export async function accountConfirm(
 
         // Set cookies
         await setSession(refreshToken)
+
+        // Send welcome email
+        const emailResult = await sendWelcomeEmail(updatedUser.email, updatedUser.username)
+
+        if (!emailResult.success) {
+            console.error("Failed to send welcome email:", emailResult.error)
+            return { success: false, error: "Failed to send welcome email. Please try again." }
+        }
 
         return { success: true, user: sessionUser, accessToken }
     } catch (error) {
