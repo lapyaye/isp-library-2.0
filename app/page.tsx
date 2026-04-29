@@ -132,7 +132,7 @@ export default function HomePage() {
               <div>
                 <h3 className="font-bold text-lg mb-1">4. Return Policy</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Books must be returned on or before the due date at the <span className="font-semibold text-foreground">designated return location</span> only.
+                  Books must be returned on or before the due date at the <span className="font-semibold text-foreground">designated bookshelf</span> only.
                 </p>
               </div>
             </div>
