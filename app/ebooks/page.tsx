@@ -8,7 +8,8 @@ export default async function EbooksPage() {
   let ebooks: Ebook[]
   try {
     ebooks = await getEbooks()
-  } catch {
+  } catch (err) {
+    console.error("[ebooks] getEbooks failed:", err)
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-2">Ebooks</h1>

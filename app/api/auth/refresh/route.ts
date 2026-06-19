@@ -49,6 +49,7 @@ export async function POST() {
             email: user.email,
             username: user.username,
             isAdmin: user.is_admin,
+            isVerified: user.is_verified,
             created_at: user.created_at.toISOString(),
             updated_at: user.updated_at.toISOString(),
         }

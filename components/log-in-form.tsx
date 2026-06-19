@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useLoginMutation, useLogoutMutation } from "@/lib/redux/services/libraryApi"
+import { useLoginMutation, useLogoutMutation, useResendConfirmationMutation } from "@/lib/redux/services/libraryApi"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { logout as reduxLogout } from "@/lib/redux/slices/authSlice"
 
@@ -38,6 +38,9 @@ export default function LoginForm() {
     const [login, { isLoading }] = useLoginMutation()
     const [logoutApi] = useLogoutMutation()
     const dispatch = useAppDispatch()
+    const [needsVerification, setNeedsVerification] = useState(false)
+    const [unverifiedEmail, setUnverifiedEmail] = useState("")
+    const [resendConfirmation, { isLoading: isResending }] = useResendConfirmationMutation()
 
     // This useEffect is used to handle the sessionExpired 
     // which is set to true when the refresh token expires
@@ -85,10 +88,24 @@ export default function LoginForm() {
                 }
             })
         }, (error) => {
-            toast.error(error.data.error)
-            setError(error.data.error)
+            if (error?.data?.needsVerification) {
+                setNeedsVerification(true)
+                setUnverifiedEmail(values.email)
+            }
+            const message = error?.data?.error ?? "Login failed. Please try again."
+            toast.error(message)
+            setError(message)
         })
 
+    }
+
+    async function handleResend() {
+        try {
+            await resendConfirmation({ email: unverifiedEmail }).unwrap()
+            toast.success("Confirmation email sent. Check your inbox.")
+        } catch {
+            toast.error("Could not resend confirmation email. Please try again.")
+        }
     }
 
     return (
@@ -131,6 +148,25 @@ export default function LoginForm() {
                     <div className="p-3 text-sm font-medium text-destructive bg-destructive/10 rounded-md">
                         {error}
                     </div>
+                )}
+
+                {needsVerification && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleResend}
+                        disabled={isResending}
+                    >
+                        {isResending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Sending...
+                            </>
+                        ) : (
+                            "Resend confirmation email"
+                        )}
+                    </Button>
                 )}
 
                 <Button type="submit" className="w-full active:scale-98" disabled={isLoading}>

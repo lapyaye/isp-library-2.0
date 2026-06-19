@@ -16,6 +16,7 @@ async function main() {
             email: "admin@library.com",
             password: adminPassword,
             is_admin: true,
+            is_verified: true,
         },
     })
     console.log(`  ✔ Admin user created: ${admin.email}`)
@@ -28,6 +29,7 @@ async function main() {
             email: "user@library.com",
             password: userPassword,
             is_admin: false,
+            is_verified: true,
         },
     })
     console.log(`  ✔ Regular user created: ${regularUser.email}`)

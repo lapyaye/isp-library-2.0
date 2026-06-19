@@ -32,6 +32,7 @@ const PUBLIC_AUTH_ENDPOINTS = [
     "api/auth/signup",
     "api/auth/logout",
     "api/auth/refresh",
+    "api/auth/resend-confirmation",
 ]
 
 const baseQueryWithReauth: BaseQueryFn<
@@ -347,6 +348,13 @@ export const libraryApi = createApi({
                 }
             },
         }),
+        resendConfirmation: builder.mutation<{ success: boolean }, { email: string }>({
+            query: (body) => ({
+                url: "api/auth/resend-confirmation",
+                method: "POST",
+                body,
+            }),
+        }),
 
         // Users
         getAllUsers: builder.query<UserProfile[], void>({
@@ -386,6 +394,7 @@ export const {
     useGetAllBooksByStatusQuery,
     useGetAllBorrowRecordsQuery,
     useLoginMutation,
+    useResendConfirmationMutation,
     useLogoutMutation,
     useSignUpMutation,
     useGetAuthorByIdQuery,

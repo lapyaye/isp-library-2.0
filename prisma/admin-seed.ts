@@ -21,6 +21,7 @@ async function seed({ username, email, password }: { username: string, email: st
             email: email,
             password: adminPassword,
             is_admin: true,
+            is_verified: true,
         },
     })
     console.log(`  ✔ Admin user created: ${admin.email}`)

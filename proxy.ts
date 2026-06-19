@@ -89,7 +89,7 @@ export async function proxy(request: NextRequest) {
 
     // Protect API routes
     if (request.nextUrl.pathname.startsWith("/api")) {
-        const publicApiPaths = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/refresh", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/account-confirm"]
+        const publicApiPaths = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/refresh", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/account-confirm", "/api/auth/resend-confirmation"]
         const adminApiPaths = ["/api/users"]
         const isPublicApi = publicApiPaths.some((path) => request.nextUrl.pathname.startsWith(path))
         const isAdminApi = adminApiPaths.some((path) => request.nextUrl.pathname.startsWith(path))

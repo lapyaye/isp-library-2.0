@@ -9,8 +9,15 @@ function getJwtClient(): JWT {
   if (!email || !rawKey) {
     throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY")
   }
-  // The private key is stored in .env with literal "\n"; convert to real newlines.
-  const key = rawKey.replace(/\\n/g, "\n")
+  // Hosts differ in how they store the key:
+  //   - dotenv strips the surrounding quotes from `.env`, leaving literal "\n".
+  //   - Vercel/other dashboards keep any quotes the value was pasted with.
+  // Strip surrounding quotes + whitespace, then convert literal "\n" to real
+  // newlines, so the same value works in both places (no-op when already clean).
+  const key = rawKey
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .replace(/\\n/g, "\n")
   return new JWT({ email, key, scopes: [SHEETS_SCOPE] })
 }
 

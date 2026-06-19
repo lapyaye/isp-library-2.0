@@ -8,6 +8,7 @@ export interface ApiResponse<T> {
     user: T
     accessToken: string
     error?: string
+    needsVerification?: boolean
 }
 
 export interface ApiReturnResponse<T> {
