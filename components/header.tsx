@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { BookOpen, BookMarked, Search, BarChart3, Library, Shield, Users } from "lucide-react"
+import { BookOpen, BookMarked, Search, BarChart3, Library, Shield, Users, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/user-nav"
 import { MobileNav } from "@/components/mobile-nav"
@@ -25,7 +25,7 @@ export function Header() {
         </div>
 
         {/* Center: Desktop Nav */}
-        <div className="hidden md:flex flex-1 justify-center">
+        <div className="hidden lg:flex flex-1 justify-center">
           <nav className="flex items-center gap-6">
             <Link
               href="/books"
@@ -71,6 +71,15 @@ export function Header() {
               >
                 <Shield className="h-4 w-4" />
                 Admin
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin/books/new"
+                className="flex items-center shrink-0 gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                Add Book
               </Link>
             )}
           </nav>

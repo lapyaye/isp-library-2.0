@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BookOpen, BookMarked, Search, BarChart3, Library, Shield, Users, Menu } from "lucide-react"
+import { BookOpen, BookMarked, Search, BarChart3, Library, Shield, Users, Menu, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -66,12 +66,19 @@ export function MobileNav() {
       active: pathname === "/admin" || pathname.startsWith("/admin/"),
       show: !!isAdmin,
     },
+    {
+      href: "/admin/books/new",
+      label: "Add Book",
+      icon: Plus,
+      active: pathname === "/admin/books/new",
+      show: !!isAdmin,
+    },
   ]
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle mobile menu</span>
         </Button>

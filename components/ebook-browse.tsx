@@ -2,10 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Check, ChevronsUpDown, Search, X } from "lucide-react"
+import { Book, Calendar, Check, ChevronsUpDown, Eye, Layers, Library, Search, User, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -172,19 +171,64 @@ export function EbookBrowse({ ebooks }: { ebooks: Ebook[] }) {
       {result.items.length === 0 ? (
         <p className="text-muted-foreground py-12 text-center">No ebooks match your search.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {result.items.map((ebook) => (
             <Card
               key={ebook.id}
               onClick={() => openBook(ebook.id)}
-              className="p-4 cursor-pointer hover:border-primary transition-colors flex flex-col gap-2"
+              className="group overflow-hidden flex flex-row h-full cursor-pointer transition-all duration-300 shadow-xs hover:shadow-sm border-border/40"
             >
-              <h3 className="font-medium line-clamp-2">{ebook.title}</h3>
-              {ebook.author && <p className="text-sm text-muted-foreground">{ebook.author}</p>}
-              <div className="mt-auto flex flex-wrap gap-2 pt-2 text-xs">
-                {ebook.publisher && <Badge variant="default">{ebook.publisher}</Badge>}
-                {ebook.year && <Badge variant="outline">{ebook.year}</Badge>}
-                {!ebook.available && <Badge variant="secondary">No preview</Badge>}
+              {/* Visual sidebar */}
+              <div className="w-2 bg-primary/20 group-hover:bg-primary transition-colors shrink-0" />
+
+              <div className="flex-1 flex flex-row items-center p-4 gap-6">
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-widest opacity-80">
+                      <Library className="h-3 w-3" />
+                      <span>Catalog Record</span>
+                    </div>
+                    <CardTitle className="leading-8 font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+                      {ebook.title}
+                    </CardTitle>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <User className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                      <span className="truncate">{ebook.author || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                      <span>{ebook.year || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <Book className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                      <span className="truncate">{ebook.publisher || "Unknown"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <Layers className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                      <span className="truncate">{ebook.edition || "—"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 border-l border-border/50 pl-6 h-full flex items-center">
+                  <Button
+                    variant="ghost"
+                    aria-label={ebook.available ? "Preview ebook" : "Preview unavailable"}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openBook(ebook.id)
+                    }}
+                    className={cn(
+                      "rounded-full h-12 w-12 p-0 hover:bg-primary dark:hover:bg-primary/80 hover:text-white border border-transparent transition-all",
+                      !ebook.available && "opacity-40",
+                    )}
+                  >
+                    <Eye className="h-6 w-6" />
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

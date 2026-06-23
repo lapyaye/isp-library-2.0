@@ -16,7 +16,7 @@ import {
 } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useGetBooksQuery, useGetAuthorsQuery } from "@/lib/redux/services/libraryApi"
-import { Loader2, Users, BookOpen, Globe2, Building2 } from "lucide-react"
+import { Loader2, Users, BookOpen, Globe2, Building2, BookMarked } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 const COLORS = ["#FF6900", "#00AC92", "#FE9900", "#7AB7AF", "#ec4899", "#06b6d4"]
@@ -38,7 +38,7 @@ function CustomTooltip({ active, payload, label }: any) {
   )
 }
 
-export function AnalyticsCharts() {
+export function AnalyticsCharts({ebooksCount}: {ebooksCount: number}) {
   const { data: books, isLoading: booksLoading, isError: booksError } = useGetBooksQuery()
   const { data: authors, isLoading: authorsLoading } = useGetAuthorsQuery()
   const isMobile = useIsMobile()
@@ -110,7 +110,7 @@ export function AnalyticsCharts() {
             <CardTitle className="text-lg font-bold">Collection Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="relative group p-6 rounded-2xl bg-primary/25 border border-primary/20 hover:bg-primary/30 transition-colors">
                 <BookOpen className="h-8 w-8 text-primary/40 absolute top-4 right-4 group-hover:scale-110 transition-transform" />
                 <p className="text-3xl font-black text-primary tracking-tight">{totalBooks}</p>
@@ -130,6 +130,11 @@ export function AnalyticsCharts() {
                 <Building2 className="h-8 w-8 text-amber-400 absolute top-4 right-4 group-hover:scale-110 transition-transform" />
                 <p className="text-3xl font-black text-amber-500 tracking-tight">{publisherData}</p>
                 <p className="text-xs font-bold text-amber-600/60 dark:text-amber-400/60 uppercase tracking-widest mt-2">Publishers</p>
+              </div>
+              <div className="relative group p-6 rounded-2xl bg-teal-50 dark:bg-amber-950/20 border border-teal-200 dark:border-teal-800/30 hover:bg-teal-100 dark:hover:bg-amber-900/40 transition-colors">
+                <BookMarked className="h-8 w-8 text-teal-400 absolute top-4 right-4 group-hover:scale-110 transition-transform" />
+                <p className="text-3xl font-black text-teal-500 tracking-tight">{ebooksCount}</p>
+                <p className="text-xs font-bold text-teal-600/60 dark:text-teal-400/60 uppercase tracking-widest mt-2">Ebooks</p>
               </div>
             </div>
           </CardContent>

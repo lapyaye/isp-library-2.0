@@ -8,7 +8,9 @@ import {
     ApiReturnResponse,
     UserProfile,
     AuthorBooks,
+    Publisher,
 } from "../../db/types"
+import type { BookCreateInput, ImportResult } from "@/lib/validation/book"
 import { setCredentials, logout } from "../slices/authSlice"
 import { RootState } from "../store"
 
@@ -137,6 +139,29 @@ export const libraryApi = createApi({
                         { type: "Book", id: "AUTHOR_LIST" },
                     ]
                     : [{ type: "Book", id: "AUTHOR_LIST" }],
+        }),
+        getPublishers: builder.query<Publisher[], void>({
+            query: () => "api/publishers",
+            transformResponse: (response: ApiReturnResponse<Publisher[]>) => response.data,
+        }),
+        addBook: builder.mutation<Book, BookCreateInput>({
+            query: (body) => ({
+                url: "api/books",
+                method: "POST",
+                body,
+            }),
+            transformResponse: (response: ApiReturnResponse<Book>) => response.data,
+            invalidatesTags: [{ type: "Book", id: "LIST" }],
+        }),
+        importBooks: builder.mutation<ImportResult, { csv: string; dryRun: boolean }>({
+            query: (body) => ({
+                url: "api/admin/books/import",
+                method: "POST",
+                body,
+            }),
+            transformResponse: (response: ApiReturnResponse<ImportResult>) => response.data,
+            invalidatesTags: (result, error, arg) =>
+                arg.dryRun ? [] : [{ type: "Book", id: "LIST" }],
         }),
 
 
@@ -402,4 +427,7 @@ export const {
     useGetAllUsersQuery,
     useGetUserByIdQuery,
     useRefreshMutation,
+    useGetPublishersQuery,
+    useAddBookMutation,
+    useImportBooksMutation,
 } = libraryApi

@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, Users, Clock, CheckCircle, Loader2, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { AdminBorrowGrid } from "@/components/admin-borrow-grid"
 import { useGetAllBorrowRecordsQuery } from "@/lib/redux/services/libraryApi"
 import { BorrowedBook } from "@/lib/db/types"
@@ -61,6 +62,12 @@ export function AdminDashboard() {
             <div>
                 <h1 className="text-3xl font-bold text-pink-700 dark:text-pink-500 mb-2">Admin Dashboard</h1>
                 <p className="text-muted-foreground">Track and manage all book borrowing activities</p>
+            </div>
+
+            <div className="mb-6">
+                <Button asChild>
+                    <Link href="/admin/books/new">+ Add Book</Link>
+                </Button>
             </div>
 
             {/* Stats Cards */}

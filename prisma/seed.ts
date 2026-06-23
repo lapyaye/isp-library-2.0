@@ -2,6 +2,7 @@ import { prisma, pool } from "../lib/prisma"
 import * as fs from "fs"
 import * as path from "path"
 import { parse } from "csv-parse"
+import { parseNumberValue } from "../lib/utils/parse-number"
 
 // Utility to parse CSV into an array of objects
 function loadCSV<T>(filePath: string): Promise<T[]> {
@@ -24,31 +25,6 @@ function loadCSV<T>(filePath: string): Promise<T[]> {
       .on("end", () => resolve(results))
       .on("error", (error) => reject(error))
   })
-}
-
-// Utility to smart parse numbers (handles both English and Myanmar digits)
-function parseNumberValue(val: string): number | null {
-  if (!val || val.trim() === "") return null
-
-  // Map of Myanmar digits to English digits
-  const myanmarToEnglishMap: Record<string, string> = {
-    '၀': '0', '၁': '1', '၂': '2', '၃': '3', '၄': '4',
-    '၅': '5', '၆': '6', '၇': '7', '၈': '8', '၉': '9'
-  }
-
-  // 1. Convert any Myanmar digits to English
-  let englishVal = ""
-  for (const char of val) {
-    englishVal += myanmarToEnglishMap[char] !== undefined ? myanmarToEnglishMap[char] : char
-  }
-
-  // 2. Extract out the numeric block (e.g., "၂၀၁၇ Edition" -> "2017")
-  const match = englishVal.match(/[0-9]+(\.[0-9]+)?/)
-  if (match && match[0]) {
-    return Number(match[0])
-  }
-
-  return null
 }
 
 async function main() {

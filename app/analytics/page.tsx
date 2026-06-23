@@ -1,6 +1,14 @@
 import { AnalyticsCharts } from "@/components/analytics-charts"
+import { getEbooks } from "@/lib/ebooks";
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  let ebooksCount = 0;
+  try{
+    const ebooks = await getEbooks();
+    ebooksCount = ebooks.length;
+  }catch(err){
+    console.error("[analytics] failed to load analytics data:", err)
+  }
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-10">
@@ -8,7 +16,7 @@ export default function AnalyticsPage() {
         <p className="text-muted-foreground text-base">Visualizing our collection growth and diversity</p>
       </div>
 
-      <AnalyticsCharts />
+      <AnalyticsCharts ebooksCount={ebooksCount} />
     </div>
   )
 }

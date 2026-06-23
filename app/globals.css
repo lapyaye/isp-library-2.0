@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Docs contain illustrative Tailwind class strings (e.g. in specs/plans);
+   keep them out of automatic source scanning so they don't emit invalid CSS. */
+@source not "../docs";
 @custom-variant dark (&:where(.dark, .dark *));
 @import "tw-animate-css";
 

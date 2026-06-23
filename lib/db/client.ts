@@ -1,6 +1,7 @@
 // Database Client - Prisma-backed data access layer
 
 import { prisma } from "@/lib/prisma"
+import type { BookCreateInput, BookImportRow } from "@/lib/validation/book"
 import {
     Book,
     BorrowedBook,
@@ -8,6 +9,7 @@ import {
     UserProfile,
     Author,
     AuthorBooks,
+    Publisher,
 } from "./types"
 import type {
     Author as PrismaAuthor,
@@ -467,4 +469,141 @@ export async function updateUserPassword(userId: string, hashedPassword: string)
     } catch {
         return false
     }
+}
+
+// ─── Publishers ─────────────────────────────────────────
+
+export async function getPublishers(): Promise<Publisher[]> {
+    const publishers = await prisma.publisher.findMany({ orderBy: { name: "asc" } })
+    return publishers.map((p: PrismaPublisher) => ({
+        id: p.id,
+        publisher_id: p.publisher_id,
+        name: p.name,
+    }))
+}
+
+// ─── Book writes ────────────────────────────────────────
+
+type TxClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+
+async function findOrCreateAuthorId(tx: TxClient, name: string): Promise<string> {
+    const existing = await tx.author.findFirst({ where: { name } })
+    if (existing) return existing.id
+    const created = await tx.author.create({ data: { name } })
+    return created.id
+}
+
+async function findOrCreatePublisherId(tx: TxClient, name: string): Promise<string> {
+    const existing = await tx.publisher.findFirst({ where: { name } })
+    if (existing) return existing.id
+    const created = await tx.publisher.create({ data: { name } })
+    return created.id
+}
+
+export async function createBook(data: BookCreateInput): Promise<Book | null> {
+    try {
+        return await prisma.$transaction(async (tx) => {
+            const authorName = data.authorName?.trim()
+            const publisherName = data.publisherName?.trim()
+            const author_id = authorName ? await findOrCreateAuthorId(tx, authorName) : null
+            const publisher_id = publisherName ? await findOrCreatePublisherId(tx, publisherName) : null
+
+            const b = await tx.book.create({
+                data: {
+                    title: data.title,
+                    language: data.language ?? null,
+                    place_of_publication: data.place_of_publication ?? null,
+                    published_year: data.published_year ?? null,
+                    edition: data.edition ?? null,
+                    price: data.price ?? null,
+                    class_number: data.class_number ?? null,
+                    source: data.source ?? null,
+                    notes: data.notes ?? null,
+                    author_id,
+                    publisher_id,
+                },
+                include: { author: true, publisher: true },
+            })
+            return {
+                id: b.id,
+                book_id: b.book_id,
+                title: b.title,
+                author_name: b.author?.name ?? null,
+                author_id: b.author_id ?? null,
+                language: b.language,
+                publisher_name: b.publisher?.name ?? null,
+                publisher_id: b.publisher_id ?? null,
+                place_of_publication: b.place_of_publication,
+                published_year: b.published_year,
+                edition: b.edition,
+                price: b.price,
+                class_number: b.class_number,
+                source: b.source,
+                notes: b.notes,
+                created_at: b.created_at.toISOString(),
+            }
+        })
+    } catch (error) {
+        console.error("createBook error:", error)
+        return null
+    }
+}
+
+export async function bulkCreateBooks(rows: BookImportRow[]): Promise<{ created: number }> {
+    if (rows.length === 0) return { created: 0 }
+
+    return prisma.$transaction(async (tx) => {
+        // Resolve distinct author names -> internal ids (create the missing ones once)
+        const authorNames = [...new Set(
+            rows.map((r) => r.author?.trim()).filter((n): n is string => !!n)
+        )]
+        const authorMap = new Map<string, string>()
+        if (authorNames.length) {
+            const existing = await tx.author.findMany({ where: { name: { in: authorNames } } })
+            existing.forEach((a) => authorMap.set(a.name, a.id))
+            const missing = authorNames.filter((n) => !authorMap.has(n))
+            if (missing.length) {
+                await tx.author.createMany({ data: missing.map((name) => ({ name })) })
+                const refetched = await tx.author.findMany({ where: { name: { in: missing } } })
+                refetched.forEach((a) => authorMap.set(a.name, a.id))
+            }
+        }
+
+        // Same for publishers
+        const publisherNames = [...new Set(
+            rows.map((r) => r.publisher?.trim()).filter((n): n is string => !!n)
+        )]
+        const publisherMap = new Map<string, string>()
+        if (publisherNames.length) {
+            const existing = await tx.publisher.findMany({ where: { name: { in: publisherNames } } })
+            existing.forEach((p) => publisherMap.set(p.name, p.id))
+            const missing = publisherNames.filter((n) => !publisherMap.has(n))
+            if (missing.length) {
+                await tx.publisher.createMany({ data: missing.map((name) => ({ name })) })
+                const refetched = await tx.publisher.findMany({ where: { name: { in: missing } } })
+                refetched.forEach((p) => publisherMap.set(p.name, p.id))
+            }
+        }
+
+        const payloads = rows.map((r) => {
+            const aName = r.author?.trim()
+            const pName = r.publisher?.trim()
+            return {
+                title: r.title,
+                language: r.language ?? null,
+                place_of_publication: r.place_of_publication ?? null,
+                published_year: r.published_year ?? null,
+                edition: r.edition ?? null,
+                price: r.price ?? null,
+                class_number: r.class_number ?? null,
+                source: r.source ?? null,
+                notes: r.notes ?? null,
+                author_id: aName ? authorMap.get(aName) ?? null : null,
+                publisher_id: pName ? publisherMap.get(pName) ?? null : null,
+            }
+        })
+
+        const result = await tx.book.createMany({ data: payloads })
+        return { created: result.count }
+    })
 }
